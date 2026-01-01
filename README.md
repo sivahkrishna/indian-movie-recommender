@@ -26,10 +26,11 @@ Cosine similarity is used to find similar movies.
 - Database: SQLite
 - ML: Pandas, Scikit-learn
 
-## 🚀 How to Run
-```bash
-py app.py
 
 ## 📌 Project Type
 
 Final Year BSc AI & ML Project
+
+## 🚀 How to Run
+```bash
+py app.py
