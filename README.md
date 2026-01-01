@@ -2,6 +2,9 @@
 
 A full-stack web application that recommends similar Indian movies using a content-based filtering approach.
 
+Project Status: In Progress
+
+
 ## 🔥 Features
 - User authentication (Register / Login / Logout)
 - Movie listing with posters
