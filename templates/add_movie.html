@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="text-center">Add Movie</h2>
+
+<form method="POST" class="mt-4">
+
+<input class="form-control mb-2" name="title" placeholder="Movie Title" required>
+<input class="form-control mb-2" name="language" placeholder="Language (Malayalam/Tamil)" required>
+<input class="form-control mb-2" name="genre" placeholder="Genre (Action, Drama)" required>
+<input class="form-control mb-2" name="director" placeholder="Director" required>
+<input class="form-control mb-2" name="cast" placeholder="Cast (comma separated)" required>
+<input class="form-control mb-2" name="keywords" placeholder="Keywords/storyline" required>
+<input class="form-control mb-2" name="release_year" type="number" placeholder="Release Year" required>
+<input class="form-control mb-2" name="poster" placeholder="Poster URL" required>
+
+<textarea class="form-control mb-3" name="description" placeholder="Description" required></textarea>
+
+<button class="btn btn-danger w-100">Add Movie</button>
+
+</form>
+
+{% endblock %}

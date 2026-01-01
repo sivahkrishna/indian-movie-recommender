@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Welcome, {{ user.username }} 👋</h2>
+
+<p class="text-secondary">
+You are successfully logged in.
+</p>
+
+<a href="/logout" class="btn btn-warning">Logout</a>
+
+{% endblock %}

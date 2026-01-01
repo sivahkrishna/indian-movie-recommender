@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="text-center">Login</h2>
+
+<form method="POST" class="w-50 mx-auto mt-4">
+
+    <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Password</label>
+        <input type="password" name="password" class="form-control" required>
+    </div>
+
+    <button class="btn btn-success w-100">Login</button>
+
+    <p class="text-center mt-3">
+        Don’t have an account? <a href="/register">Register</a>
+    </p>
+
+</form>
+
+{% endblock %}

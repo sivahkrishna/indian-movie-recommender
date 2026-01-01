@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-md-4">
+        <img src="{{ movie.poster }}" class="img-fluid rounded">
+    </div>
+
+    <div class="col-md-8">
+        <h2>{{ movie.title }}</h2>
+        <p><b>Language:</b> {{ movie.language }}</p>
+        <p><b>Genre:</b> {{ movie.genre }}</p>
+        <p><b>Director:</b> {{ movie.director }}</p>
+        <p><b>Cast:</b> {{ movie.cast }}</p>
+        <p><b>Release Year:</b> {{ movie.release_year }}</p>
+        <p>{{ movie.description }}</p>
+    </div>
+</div>
+
+<hr>
+
+<h4 class="mt-4">🎯 Similar Movies</h4>
+
+<div class="row">
+{% for rec in recommendations %}
+  <div class="col-md-3 mb-3">
+    <div class="card h-100">
+        <a href="/movie/{{ rec.id }}">
+            {% if rec.poster %}
+               <img src="{{ rec.poster }}" class="card-img-top" height="250">
+            {% else %}
+            <div class="bg-secondary text-center text-light p-5">
+                No Image
+            </div>
+            {% endif %}
+
+        </a>
+      <div class="card-body">
+        <small>{{ rec.title }}</small>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+</div>
+
+
+{% endblock %}
