@@ -17,6 +17,65 @@
     </div>
 </div>
 
+<a href="/wishlist/add/{{ movie.id }}"
+   class="btn btn-outline-danger mb-3">
+    ❤️ Add to Wishlist
+</a>
+
+{% if current_user.is_authenticated %}
+<form method="POST" action="/rate/{{ movie.id }}" class="mb-4">
+
+  <label><b>Your Rating:</b></label>
+  <select name="rating" class="form-control w-25 mb-2">
+    <option value="1">1 ⭐</option>
+    <option value="2">2 ⭐</option>
+    <option value="3">3 ⭐</option>
+    <option value="4">4 ⭐</option>
+    <option value="5">5 ⭐</option>
+  </select>
+
+  <label><b>Your Review:</b></label>
+  <textarea name="review"
+            class="form-control mb-2"
+            placeholder="Write your review..."
+            rows="3"></textarea>
+
+  <button type="submit" class="btn btn-success btn-sm">
+    Submit Review
+  </button>
+</form>
+
+
+{% else %}
+<p class="text-secondary">Login to rate and review this movie.</p>
+{% endif %}
+
+<hr>
+<h4>📝 User Reviews</h4>
+
+{% if ratings|length == 0 %}
+  <p class="text-secondary">No reviews yet.</p>
+{% endif %}
+
+{% for r in ratings %}
+  <div class="border rounded p-3 mb-3">
+    <b>{{ r.user.username }}</b>
+    <span class="text-warning">
+      {{ r.rating }} ⭐
+    </span>
+    <p class="mb-0">
+      {{ r.review or "No written review" }}
+    </p>
+  </div>
+{% endfor %}
+
+
+{% if avg_rating %}
+<p><b>Average Rating:</b> {{ avg_rating }} ⭐ ({{ ratings|length }} reviews)</p>
+{% else %}
+<p class="text-secondary">No ratings yet</p>
+{% endif %}
+
 <hr>
 
 <h4 class="mt-4">🎯 Similar Movies</h4>

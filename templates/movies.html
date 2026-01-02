@@ -3,20 +3,76 @@
 
 <h2 class="text-center mb-4">Movies</h2>
 
+<!-- SEARCH & FILTER FORM -->
+<form method="GET" class="row g-2 mb-4">
+
+  <div class="col-md-3">
+    <input type="text" name="search" class="form-control"
+           placeholder="Search movie title..."
+           value="{{ request.args.get('search','') }}">
+  </div>
+
+  <div class="col-md-3">
+    <select name="language" class="form-control">
+      <option value="">All Languages</option>
+      {% for lang in languages %}
+        <option value="{{ lang }}"
+          {% if request.args.get('language') == lang %}selected{% endif %}>
+          {{ lang }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-3">
+    <select name="genre" class="form-control">
+      <option value="">All Genres</option>
+      {% for gen in genres %}
+        <option value="{{ gen }}"
+          {% if request.args.get('genre') == gen %}selected{% endif %}>
+          {{ gen }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <select name="year" class="form-control">
+      <option value="">All Years</option>
+      {% for y in years %}
+        <option value="{{ y }}"
+          {% if request.args.get('year') == y|string %}selected{% endif %}>
+          {{ y }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-1 d-grid">
+    <button class="btn btn-danger">Go</button>
+  </div>
+
+</form>
+
+<!-- MOVIE GRID -->
 <div class="row">
-    {% for movie in movies %}
-        <div class="col-md-3 mb-4">
-            <div class="card h-100">
-                <a href="/movie/{{ movie.id }}">
-                    <img src="{{ movie.poster }}" class="card-img-top" height="350">
-                </a>
-                <div class="card-body">
-                <h6>{{ movie.title }}</h6>
-                <small>{{ movie.language }} | {{ movie.release_year }}</small>
-            </div>
-        </div>
+{% for movie in movies %}
+  <div class="col-md-3 mb-4">
+    <div class="card h-100">
+      <a href="/movie/{{ movie.id }}">
+        <img src="{{ movie.poster }}" class="card-img-top" height="350">
+      </a>
+      <div class="card-body">
+        <h6>{{ movie.title }}</h6>
+        <small>{{ movie.language }} | {{ movie.release_year }}</small>
       </div>
-    {% endfor %}
+    </div>
+  </div>
+{% endfor %}
 </div>
+
+{% if movies|length == 0 %}
+  <p class="text-center text-secondary">No movies found.</p>
+{% endif %}
 
 {% endblock %}

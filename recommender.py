@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 def get_recommendations(movie_id, movies):
@@ -19,9 +19,12 @@ def get_recommendations(movie_id, movies):
     df = pd.DataFrame(data)
 
     # Vectorize text
-    cv = CountVectorizer(stop_words="english")
-    vectors = cv.fit_transform(df["combined"])
-
+    tfidf = TfidfVectorizer(
+    stop_words="english",
+    ngram_range=(1, 2),
+    min_df=1
+    )
+    vectors = tfidf.fit_transform(df["combined"])
     # Cosine similarity
     similarity = cosine_similarity(vectors)
 
