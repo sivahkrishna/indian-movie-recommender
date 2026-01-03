@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>{{ 'Edit Movie' if movie else 'Add Movie' }}</h3>
+
+<form method="POST" class="w-75">
+
+  <input name="title" class="form-control mb-2"
+         placeholder="Title" value="{{ movie.title if movie }}">
+
+  <input name="language" class="form-control mb-2"
+         placeholder="Language" value="{{ movie.language if movie }}">
+
+  <input name="genre" class="form-control mb-2"
+         placeholder="Genre" value="{{ movie.genre if movie }}">
+
+  <input name="keywords" class="form-control mb-2"
+         placeholder="Keywords" value="{{ movie.keywords if movie }}">
+
+  <input name="cast" class="form-control mb-2"
+         placeholder="Cast" value="{{ movie.cast if movie }}">
+
+  <input name="director" class="form-control mb-2"
+         placeholder="Director" value="{{ movie.director if movie }}">
+
+  <textarea name="description" class="form-control mb-2"
+            placeholder="Description">{{ movie.description if movie }}</textarea>
+
+  <input name="release_year" class="form-control mb-2"
+         placeholder="Release Year" value="{{ movie.release_year if movie }}">
+
+  <input name="poster" class="form-control mb-3"
+         placeholder="Poster URL" value="{{ movie.poster if movie }}">
+
+  <button class="btn btn-success">Save</button>
+  <a href="/admin/movies" class="btn btn-secondary">Cancel</a>
+
+</form>
+
+{% endblock %}

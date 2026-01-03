@@ -1,22 +1,65 @@
 {% extends "base.html" %}
+
 {% block content %}
+<div class="container mt-4">
 
-<h3>👤 Profile</h3>
+  <h3 class="mb-4">👤 My Profile</h3>
 
-<img src="{{ url_for('static', filename='uploads/' + current_user.profile_image) }}"
-     class="rounded-circle mb-3"
-     width="120" height="120">
+  <!-- PROFILE IMAGE PREVIEW -->
+  <div class="mb-3">
+    <img src="{{ url_for('static', filename='uploads/' + current_user.profile_image) }}"
+         alt="Profile Image"
+         width="140"
+         height="140"
+         class="rounded-circle border">
+  </div>
 
-<form method="POST" enctype="multipart/form-data">
-  <input type="file" name="image" class="form-control w-50 mb-2">
-  <button class="btn btn-primary btn-sm">Upload</button>
-</form>
+  <!-- PROFILE UPDATE FORM -->
+  <form method="POST" enctype="multipart/form-data" class="w-50">
 
-<p><b>Name:</b> {{ current_user.username }}</p>
-<p><b>Email:</b> {{ current_user.email }}</p>
+    <!-- IMAGE UPLOAD -->
+    <div class="mb-3">
+      <label class="form-label">Change Profile Image</label>
+      <input type="file" name="image" class="form-control">
+    </div>
 
-{% if current_user.is_admin %}
-<span class="badge bg-danger">ADMIN</span>
-{% endif %}
+    <!-- USERNAME -->
+    <div class="mb-3">
+      <label class="form-label">Username</label>
+      <input type="text"
+             name="username"
+             value="{{ current_user.username }}"
+             class="form-control"
+             required>
+    </div>
 
+    <!-- EMAIL -->
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email"
+             name="email"
+             value="{{ current_user.email }}"
+             class="form-control"
+             required>
+    </div>
+
+    <!-- ADMIN / VERIFIED BADGES -->
+    <div class="mb-3">
+      {% if current_user.is_admin %}
+        <span class="badge bg-danger">ADMIN</span>
+      {% endif %}
+
+      {% if current_user.is_verified %}
+        <span class="badge bg-success">✔ VERIFIED</span>
+      {% endif %}
+    </div>
+
+    <!-- SUBMIT -->
+    <button type="submit" class="btn btn-primary">
+      Save Changes
+    </button>
+
+  </form>
+
+</div>
 {% endblock %}

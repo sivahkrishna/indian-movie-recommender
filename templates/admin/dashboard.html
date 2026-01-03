@@ -1,27 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>🛠 Admin Dashboard</h2>
+<h2 class="mb-4">📊 Admin Dashboard</h2>
 
-<h4>👥 Users</h4>
-<ul>
-{% for u in users %}
-  <li>
-    {{ u.username }} ({{ u.email }})
-    {% if u.is_admin %}
-      <span class="badge bg-danger">ADMIN</span>
-    {% endif %}
-  </li>
-{% endfor %}
-</ul>
+<div class="row">
 
-<hr>
+  <div class="col-md-4">
+    <div class="card text-center shadow">
+      <div class="card-body">
+        <h5>👥 Users</h5>
+        <h2>{{ users_count }}</h2>
+      </div>
+    </div>
+  </div>
 
-<h4>🎬 Movies</h4>
-<ul>
-{% for m in movies %}
-  <li>{{ m.title }} ({{ m.language }})</li>
-{% endfor %}
-</ul>
+  <div class="col-md-4">
+    <div class="card text-center shadow">
+      <div class="card-body">
+        <h5>🎬 Movies</h5>
+        <h2>{{ movies_count }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card text-center shadow">
+      <div class="card-body">
+        <h5>⭐ Ratings</h5>
+        <h2>{{ ratings_count }}</h2>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<hr class="my-4">
+
+<a href="/admin/movies" class="btn btn-primary">
+  🎬 Manage Movies
+</a>
+<a href="/admin/users" class="btn btn-dark">
+  👥 Manage Users
+</a>
 
 {% endblock %}

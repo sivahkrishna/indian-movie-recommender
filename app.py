@@ -45,7 +45,8 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(200), nullable=False)
     profile_image = db.Column(db.String(200), default="default.png")
     is_admin = db.Column(db.Boolean, default=False)
-
+    is_active = db.Column(db.Boolean, default=True)
+    is_verified = db.Column(db.Boolean, default=False)
 
 
 # ---------------- MOVIE MODEL ----------------
@@ -98,6 +99,19 @@ def register():
         email = request.form["email"]
         password = request.form["password"]
 
+        image = request.files.get("image")
+        filename = "default.png"
+        if image:
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+        user = User(
+            username=username,
+            email=email,
+            password=password,
+            profile_image=filename
+        )
+
         if User.query.filter_by(email=email).first():
             flash("Email already registered", "danger")
             return redirect(url_for("register"))
@@ -125,7 +139,10 @@ def login():
         if user and check_password_hash(user.password, password):
             login_user(user)
             flash("Login successful", "success")
-            return redirect(url_for("dashboard"))
+            if user.is_admin:
+                return redirect(url_for("admin_dashboard"))
+            else:
+                return redirect(url_for("movies"))  
         else:
             flash("Invalid email or password", "danger")
 
@@ -151,7 +168,61 @@ def profile():
 def admin_dashboard():
     users = User.query.all()
     movies = Movie.query.all()
-    return render_template("admin/dashboard.html", users=users, movies=movies)
+    users_count = User.query.count()
+    movies_count = Movie.query.count()
+    ratings_count = Rating.query.count()
+    return render_template("admin/dashboard.html", users=users, movies=movies,  
+        users_count=users_count,
+        movies_count=movies_count,
+        ratings_count=ratings_count)
+
+@app.route("/admin/movie/add", methods=["GET", "POST"])
+@login_required
+@admin_required
+def admin_add_movie():
+    if request.method == "POST":
+        movie = Movie(
+            title=request.form["title"],
+            language=request.form["language"],
+            genre=request.form["genre"],
+            keywords=request.form["keywords"],
+            cast=request.form["cast"],
+            director=request.form["director"],
+            description=request.form["description"],
+            release_year=request.form["release_year"],
+            poster=request.form["poster"]
+        )
+        db.session.add(movie)
+        db.session.commit()
+        flash("Movie added successfully", "success")
+        return redirect(url_for("admin_movies"))
+
+    return render_template("admin/movie_form.html", movie=None)
+
+
+@app.route("/admin/movie/edit/<int:movie_id>", methods=["GET", "POST"])
+@login_required
+@admin_required
+def admin_edit_movie(movie_id):
+    movie = Movie.query.get_or_404(movie_id)
+
+    if request.method == "POST":
+        movie.title = request.form["title"]
+        movie.language = request.form["language"]
+        movie.genre = request.form["genre"]
+        movie.keywords = request.form["keywords"]
+        movie.cast = request.form["cast"]
+        movie.director = request.form["director"]
+        movie.description = request.form["description"]
+        movie.release_year = request.form["release_year"]
+        movie.poster = request.form["poster"]
+
+        db.session.commit()
+        flash("Movie updated successfully", "success")
+        return redirect(url_for("admin_movies"))
+
+    return render_template("admin/movie_form.html", movie=movie)
+
 
 
 # ---------- ADD TO WISHLIST ----------
@@ -333,11 +404,62 @@ def movies():
         years=[y[0] for y in years]
     )
 
+@app.route("/admin/users")
+@login_required
+@admin_required
+def admin_users():
+    users = User.query.all()
+    return render_template("admin/users.html", users=users)
+
+@app.route("/admin/user/toggle/<int:user_id>")
+@login_required
+@admin_required
+def toggle_user(user_id):
+    user = User.query.get_or_404(user_id)
+    user.is_active = not user.is_active
+    db.session.commit()
+    return redirect(url_for("admin_users"))
+
+@app.route("/admin/user/verify/<int:user_id>")
+@login_required
+@admin_required
+def verify_user(user_id):
+    user = User.query.get_or_404(user_id)
+    user.is_verified = not user.is_verified
+    db.session.commit()
+    return redirect(url_for("admin_users"))
+
+@app.route("/admin/user/delete/<int:user_id>")
+@login_required
+@admin_required
+def delete_user(user_id):
+    Rating.query.filter_by(user_id=user_id).delete()
+    Wishlist.query.filter_by(user_id=user_id).delete()
+    User.query.filter_by(id=user_id).delete()
+    db.session.commit()
+    return redirect(url_for("admin_users"))
+
+@app.route("/admin/movies")
+@login_required
+@admin_required
+def admin_movies():
+    movies = Movie.query.all()
+    return render_template("admin/movies.html", movies=movies)
+
+@app.route("/admin/movie/delete/<int:movie_id>")
+@login_required
+@admin_required
+def delete_movie(movie_id):
+    Rating.query.filter_by(movie_id=movie_id).delete()
+    Wishlist.query.filter_by(movie_id=movie_id).delete()
+    Movie.query.filter_by(id=movie_id).delete()
+    db.session.commit()
+    return redirect(url_for("admin_movies"))
+
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run(debug=True)
 
-print(app.url_map)
-print(app.url_map)
 

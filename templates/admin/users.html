@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <h2 class="mb-4">👥 Manage Users</h2>
+
+  <table class="table table-bordered table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Profile</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Badges</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+    {% for u in users %}
+      <tr>
+
+        <!-- PROFILE IMAGE -->
+        <td>
+          <img src="{{ url_for('static', filename='uploads/' + u.profile_image) }}"
+               width="40" height="40"
+               class="rounded-circle">
+        </td>
+
+        <!-- USERNAME -->
+        <td>{{ u.username }}</td>
+
+        <!-- EMAIL -->
+        <td>{{ u.email }}</td>
+
+        <!-- ACTIVE STATUS -->
+        <td>
+          {% if u.is_active %}
+            <span class="badge bg-success">Active</span>
+          {% else %}
+            <span class="badge bg-secondary">Inactive</span>
+          {% endif %}
+        </td>
+
+        <!-- BADGES -->
+        <td>
+          {% if u.is_admin %}
+            <span class="badge bg-danger">ADMIN</span>
+          {% endif %}
+
+          {% if u.is_verified %}
+            <span class="badge bg-primary">✔ Verified</span>
+          {% endif %}
+        </td>
+
+        <!-- ACTIONS -->
+        <td>
+          <a href="/admin/user/toggle/{{ u.id }}"
+             class="btn btn-sm btn-warning mb-1">
+            Activate / Deactivate
+          </a>
+
+          <a href="/admin/user/verify/{{ u.id }}"
+             class="btn btn-sm btn-info mb-1">
+            Verify
+          </a>
+
+          <a href="/admin/user/delete/{{ u.id }}"
+             class="btn btn-sm btn-danger"
+             onclick="return confirm('Delete this user?')">
+            Delete
+          </a>
+        </td>
+
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="/admin" class="btn btn-secondary mt-3">
+    ← Back to Dashboard
+  </a>
+
+</div>
+{% endblock %}

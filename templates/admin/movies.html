@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="mb-4">🎬 Manage Movies</h2>
+
+<a href="/admin/movie/add" class="btn btn-success mb-3">
+  ➕ Add New Movie
+</a>
+
+<table class="table table-bordered table-hover">
+  <thead class="table-dark">
+    <tr>
+      <th>Title</th>
+      <th>Language</th>
+      <th>Year</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for m in movies %}
+    <tr>
+      <td>{{ m.title }}</td>
+      <td>{{ m.language }}</td>
+      <td>{{ m.release_year }}</td>
+      <td>
+        <a href="/admin/movie/edit/{{ m.id }}" class="btn btn-sm btn-primary">
+          Edit
+        </a>
+        <a href="/admin/movie/delete/{{ m.id }}"
+           class="btn btn-sm btn-danger"
+           onclick="return confirm('Delete this movie?')">
+          Delete
+        </a>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
