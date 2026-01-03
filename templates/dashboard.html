@@ -1,12 +1,57 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h2>Welcome, {{ user.username }} 👋</h2>
+<div class="container mt-4">
 
-<p class="text-secondary">
-You are successfully logged in.
-</p>
+  <h2 class="mb-4">📊 My Dashboard</h2>
 
-<a href="/logout" class="btn btn-warning">Logout</a>
+  <!-- WATCHLIST -->
+  <h4>📌 Watchlist</h4>
+  {% if watchlist %}
+    <div class="row">
+    {% for w in watchlist %}
+      <div class="col-md-3 mb-3">
+        <div class="card">
+          <img src="{{ w.movie.poster }}" class="card-img-top">
+          <div class="card-body">
+            <h6>{{ w.movie.title }}</h6>
+            <a href="/movie/{{ w.movie.id }}" class="btn btn-sm btn-primary">
+              View
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No movies in watchlist.</p>
+  {% endif %}
+
+  <hr>
+
+  <!-- WATCHED -->
+  <h4>✅ Watched Movies</h4>
+  {% if watched %}
+    <div class="row">
+    {% for w in watched %}
+      <div class="col-md-3 mb-3">
+        <div class="card border-success">
+          <img src="{{ w.movie.poster }}" class="card-img-top">
+          <div class="card-body">
+            <h6>{{ w.movie.title }}</h6>
+            <span class="badge bg-success">Watched</span>
+            <a href="/movie/{{ w.movie.id }}" class="btn btn-sm btn-secondary mt-1">
+              View
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No watched movies yet.</p>
+  {% endif %}
+
+</div>
 
 {% endblock %}

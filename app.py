@@ -71,6 +71,16 @@ class Wishlist(db.Model):
     user = db.relationship("User", backref="wishlist_items")
     movie = db.relationship("Movie")
 
+class Watchlist(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    movie_id = db.Column(db.Integer, db.ForeignKey("movie.id"))
+    status = db.Column(db.String(20))  # "watchlist" or "watched"
+
+    user = db.relationship("User")
+    movie = db.relationship("Movie")
+
+
 class Rating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
@@ -89,7 +99,7 @@ def load_user(user_id):
 # ---------------- ROUTES ----------------
 @app.route("/")
 def home():
-    return render_template("home.html")
+    return render_template("login.html")
 
 # ---------- REGISTER ----------
 @app.route("/register", methods=["GET", "POST"])
@@ -358,6 +368,21 @@ def movie_detail(movie_id):
 @app.route("/dashboard")
 @login_required
 def dashboard():
+    watchlist_movies = Watchlist.query.filter_by(
+        user_id=current_user.id,
+        status="watchlist"
+    ).all()
+
+    watched_movies = Watchlist.query.filter_by(
+        user_id=current_user.id,
+        status="watched"
+    ).all()
+
+    return render_template(
+        "dashboard.html",
+        watchlist=watchlist_movies,
+        watched=watched_movies
+    )
     return render_template("dashboard.html", user=current_user)
 
 # ---------- LOGOUT ----------
@@ -455,6 +480,48 @@ def delete_movie(movie_id):
     Movie.query.filter_by(id=movie_id).delete()
     db.session.commit()
     return redirect(url_for("admin_movies"))
+
+@app.route("/watchlist/add/<int:movie_id>")
+@login_required
+def add_to_watchlist(movie_id):
+    existing = Watchlist.query.filter_by(
+        user_id=current_user.id,
+        movie_id=movie_id
+    ).first()
+
+    if not existing:
+        w = Watchlist(
+            user_id=current_user.id,
+            movie_id=movie_id,
+            status="watchlist"
+        )
+        db.session.add(w)
+        db.session.commit()
+        flash("Added to watchlist", "success")
+
+    return redirect(url_for("movie_detail", movie_id=movie_id))
+
+@app.route("/watchlist/watched/<int:movie_id>")
+@login_required
+def mark_as_watched(movie_id):
+    entry = Watchlist.query.filter_by(
+        user_id=current_user.id,
+        movie_id=movie_id
+    ).first()
+
+    if entry:
+        entry.status = "watched"
+    else:
+        entry = Watchlist(
+            user_id=current_user.id,
+            movie_id=movie_id,
+            status="watched"
+        )
+        db.session.add(entry)
+
+    db.session.commit()
+    flash("Marked as watched", "success")
+    return redirect(url_for("movie_detail", movie_id=movie_id))
 
 
 if __name__ == "__main__":

@@ -23,6 +23,19 @@
 </a>
 
 {% if current_user.is_authenticated %}
+  <a href="/watchlist/add/{{ movie.id }}"
+     class="btn btn-outline-primary btn-sm">
+     ➕ Add to Watchlist
+  </a>
+
+  <a href="/watchlist/watched/{{ movie.id }}"
+     class="btn btn-outline-success btn-sm">
+     ✅ Mark as Watched
+  </a>
+{% endif %}
+
+
+{% if current_user.is_authenticated %}
 <form method="POST" action="/rate/{{ movie.id }}" class="mb-4">
 
   <label><b>Your Rating:</b></label>
