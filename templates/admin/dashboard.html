@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>🛠 Admin Dashboard</h2>
+
+<h4>👥 Users</h4>
+<ul>
+{% for u in users %}
+  <li>
+    {{ u.username }} ({{ u.email }})
+    {% if u.is_admin %}
+      <span class="badge bg-danger">ADMIN</span>
+    {% endif %}
+  </li>
+{% endfor %}
+</ul>
+
+<hr>
+
+<h4>🎬 Movies</h4>
+<ul>
+{% for m in movies %}
+  <li>{{ m.title }} ({{ m.language }})</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

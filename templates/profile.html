@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>👤 Profile</h3>
+
+<img src="{{ url_for('static', filename='uploads/' + current_user.profile_image) }}"
+     class="rounded-circle mb-3"
+     width="120" height="120">
+
+<form method="POST" enctype="multipart/form-data">
+  <input type="file" name="image" class="form-control w-50 mb-2">
+  <button class="btn btn-primary btn-sm">Upload</button>
+</form>
+
+<p><b>Name:</b> {{ current_user.username }}</p>
+<p><b>Email:</b> {{ current_user.email }}</p>
+
+{% if current_user.is_admin %}
+<span class="badge bg-danger">ADMIN</span>
+{% endif %}
+
+{% endblock %}

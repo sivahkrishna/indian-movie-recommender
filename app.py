@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, abort, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
     LoginManager, UserMixin,
@@ -7,10 +7,24 @@ from flask_login import (
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from recommender import get_recommendations
+from werkzeug.utils import secure_filename
+import os
+from functools import wraps
 
 
 app = Flask(__name__)
 app.secret_key = "movie_secret_key"
+
+UPLOAD_FOLDER = "static/uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not current_user.is_admin:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated
 
 # Database config
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
@@ -29,6 +43,10 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    profile_image = db.Column(db.String(200), default="default.png")
+    is_admin = db.Column(db.Boolean, default=False)
+
+
 
 # ---------------- MOVIE MODEL ----------------
 class Movie(db.Model):
@@ -112,6 +130,29 @@ def login():
             flash("Invalid email or password", "danger")
 
     return render_template("login.html")
+
+@app.route("/profile", methods=["GET", "POST"])
+@login_required
+def profile():
+    if request.method == "POST":
+        file = request.files.get("image")
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+            current_user.profile_image = filename
+            db.session.commit()
+            flash("Profile image updated", "success")
+
+    return render_template("profile.html")
+
+@app.route("/admin")
+@login_required
+@admin_required
+def admin_dashboard():
+    users = User.query.all()
+    movies = Movie.query.all()
+    return render_template("admin/dashboard.html", users=users, movies=movies)
+
 
 # ---------- ADD TO WISHLIST ----------
 @app.route("/wishlist/add/<int:movie_id>")

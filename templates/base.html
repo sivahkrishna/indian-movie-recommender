@@ -6,6 +6,8 @@
 
     <!-- Bootstrap CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body.light {
         background-color: #f8f9fa;
@@ -37,27 +39,109 @@ window.onload = function() {
 <body class="bg-dark text-light">
 
 <nav class="navbar navbar-dark bg-black">
-    <div class="container">
-        <a class="navbar-brand" href="/">🎬 Movie Recommender</a>
-         <div>
-            {% if current_user.is_authenticated %}
-                <a href="/dashboard" class="btn btn-sm btn-outline-light">Dashboard</a>
-                <a href="/logout" class="btn btn-sm btn-danger">Logout</a>
-                <a href="/movies" class="btn btn-sm btn-outline-light">Movies</a>
-                <a href="/add-movie" class="btn btn-sm btn-outline-warning">Add Movie</a>
-                <a href="/wishlist" class="btn btn-sm btn-outline-danger">
-                    ❤️ Wishlist
-                </a>
-                <button onclick="toggleTheme()" class="btn btn-sm btn-outline-light">
-                    🌙 / ☀️
-                </button>
-            {% else %}
-                <a href="/login" class="btn btn-sm btn-outline-light">Login</a>
-                <a href="/register" class="btn btn-sm btn-danger">Register</a>
-            {% endif %}
-        </div>
+  <div class="container-fluid">
+
+    <!-- LEFT: BRAND -->
+    <a class="navbar-brand" href="/movies">
+      🎬 Movie Recommender
+    </a>
+
+    <!-- RIGHT: PROFILE ICON -->
+    {% if current_user.is_authenticated %}
+    <div class="dropdown">
+
+      <!-- PROFILE IMAGE ICON -->
+      <a href="#"
+         class="d-flex align-items-center text-white text-decoration-none"
+         id="profileDropdown"
+         data-bs-toggle="dropdown"
+         aria-expanded="false">
+
+        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_image) }}"
+             alt="profile"
+             width="40"
+             height="40"
+             class="rounded-circle">
+      </a>
+
+      <!-- DROPDOWN MENU -->
+      <ul class="dropdown-menu dropdown-menu-end text-small shadow">
+    
+
+        <!-- USER INFO -->
+        <li class="px-3 py-2">
+          <b>{{ current_user.username }}</b><br>
+          <small class="text-muted">{{ current_user.email }}</small>
+          <br>
+          {% if current_user.is_admin %}
+            <span class="badge bg-danger mt-1">ADMIN</span>
+            <a class="dropdown-item" href="/admin">
+                <i class="bi bi-shield-lock"></i> Admin Panel
+            </a>
+          {% endif %}
+        </li>
+
+        <li><hr class="dropdown-divider"></li>
+
+        <!-- PROFILE -->
+        <li>
+          <a class="dropdown-item" href="/profile">
+            👤 Profile
+          </a>
+        </li>
+
+        <!-- DASHBOARD -->
+        <li>
+          <a class="dropdown-item" href="/dashboard">
+            📊 Dashboard
+          </a>
+        </li>
+
+        <!-- WISHLIST -->
+        <li>
+          <a class="dropdown-item" href="/wishlist">
+            ❤️ Wishlist
+          </a>
+        </li>
+
+        <!-- THEME -->
+        <li>
+          <a class="dropdown-item" href="#" onclick="toggleTheme()">
+            🌗 Dark / Light
+          </a>
+        </li>
+
+        {% if current_user.is_admin %}
+        <li>
+          <a class="dropdown-item" href="/admin">
+            🛠 Admin Panel
+          </a>
+        </li>
+        {% endif %}
+
+        <li><hr class="dropdown-divider"></li>
+
+        <!-- LOGOUT -->
+        <li>
+          <a class="dropdown-item text-danger" href="/logout">
+            🚪 Logout
+          </a>
+        </li>
+
+      </ul>
     </div>
+
+    {% else %}
+    <!-- IF NOT LOGGED IN -->
+    <div>
+      <a href="/login" class="btn btn-sm btn-outline-light">Login</a>
+      <a href="/register" class="btn btn-sm btn-danger">Register</a>
+    </div>
+    {% endif %}
+
+  </div>
 </nav>
+
 
 <div class="container mt-4">
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -69,6 +153,25 @@ window.onload = function() {
     {% endwith %}
     {% block content %}{% endblock %}
 </div>
+
+<script>
+function toggleTheme() {
+  document.body.classList.toggle("light");
+
+  localStorage.setItem(
+    "theme",
+    document.body.classList.contains("light") ? "light" : "dark"
+  );
+}
+
+window.onload = function () {
+  if (localStorage.getItem("theme") === "light") {
+    document.body.classList.add("light");
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 
 </body>
 </html>
