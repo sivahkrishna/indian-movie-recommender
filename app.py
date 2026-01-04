@@ -77,6 +77,10 @@ class Watchlist(db.Model):
     movie_id = db.Column(db.Integer, db.ForeignKey("movie.id"))
     status = db.Column(db.String(20))  # "watchlist" or "watched"
 
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "movie_id", name="unique_user_movie"),
+    )
+
     user = db.relationship("User")
     movie = db.relationship("Movie")
 
@@ -330,21 +334,40 @@ def add_movie():
 def movie_detail(movie_id):
     movie = Movie.query.get_or_404(movie_id)
 
-    # All ratings for this movie
-    ratings = Rating.query.filter_by(movie_id=movie_id).all()
+    watched_ids = []
 
-    # Average rating
+    if current_user.is_authenticated:
+        watched = Watchlist.query.filter_by(
+            user_id=current_user.id,
+            status="watched"
+        ).all()
+        watched_ids = [w.movie_id for w in watched]
+    # ✅ ALWAYS define this FIRST
+    all_movies = Movie.query.all()
+
+    # Ratings
+    ratings = Rating.query.filter_by(movie_id=movie_id).all()
     avg_rating = None
     if ratings:
         avg_rating = round(
             sum(r.rating for r in ratings) / len(ratings), 1
         )
 
-    # Recommendations (already working)
-    all_movies = Movie.query.all()
-    recommended_ids = get_recommendations(movie_id, all_movies)
-    recommended_movies = []
+    # User id for personalized recommendations
+    user_id = current_user.id if current_user.is_authenticated else None
 
+    # ✅ Now safe to use all_movies
+    recommended_ids = get_recommendations(
+        movie_id,
+        all_movies,
+        watched_ids=watched_ids
+    )
+    if recommended_ids:
+        recommended_movies = Movie.query.filter(
+            Movie.id.in_(recommended_ids)
+    ).all()
+
+    recommended_movies = []
     if recommended_ids:
         movie_map = {
             m.id: m for m in Movie.query.filter(
@@ -358,10 +381,11 @@ def movie_detail(movie_id):
     return render_template(
         "movie_detail.html",
         movie=movie,
-        recommendations=recommended_movies,
         ratings=ratings,
-        avg_rating=avg_rating
+        avg_rating=avg_rating,
+        recommendations=recommended_movies
     )
+
 
 
 # ---------- DASHBOARD (PROTECTED) ----------
@@ -522,6 +546,30 @@ def mark_as_watched(movie_id):
     db.session.commit()
     flash("Marked as watched", "success")
     return redirect(url_for("movie_detail", movie_id=movie_id))
+
+@app.route("/watchlist/add/<int:movie_id>")
+@login_required
+def add_to_watchlist_movie(movie_id):
+    entry = Watchlist.query.filter_by(
+        user_id=current_user.id,
+        movie_id=movie_id
+    ).first()
+
+    if entry:
+        flash("Movie already in your list", "info")
+    else:
+        db.session.add(
+            Watchlist(
+                user_id=current_user.id,
+                movie_id=movie_id,
+                status="watchlist"
+            )
+        )
+        db.session.commit()
+        flash("Added to watchlist", "success")
+
+    return redirect(url_for("movie_detail", movie_id=movie_id))
+
 
 
 if __name__ == "__main__":
